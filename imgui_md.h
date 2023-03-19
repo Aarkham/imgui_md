@@ -40,12 +40,14 @@ struct imgui_md
 	int print(const char* str, const char* str_end);
 
 	//for example, these flags can be changed in div callback
-	
+
 	//draw border
 	bool m_table_border = true;
 	//render header in a different way than other rows
 	bool m_table_header_highlight = true;
-	
+
+	float m_indent_size = 40.0f;
+
 protected:
 
 	virtual void BLOCK_DOC(bool);
@@ -104,7 +106,7 @@ protected:
 	//returns true if the term has been processed
 	virtual bool check_html(const char* str, const char* str_end);
 
-	//called when '\n' in source text where it is not semantically meaningful 
+	//called when '\n' in source text where it is not semantically meaningful
 	virtual void soft_break();
 
 	//e==true : enter
@@ -124,7 +126,7 @@ protected:
 	bool m_is_image = false;
 	bool m_is_code = false;
 	unsigned m_hlevel=0;//0 - no heading
-	
+
 private:
 
 	int text(MD_TEXTTYPE type, const char* str, const char* str_end);
@@ -132,7 +134,7 @@ private:
 	int span(MD_SPANTYPE type, void* d, bool e);
 
 	void render_text(const char* str, const char* str_end);
-	
+
 	void set_font(bool e);
 	void set_color(bool e);
 	void set_href(bool e, const MD_ATTRIBUTE& src);

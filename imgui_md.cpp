@@ -104,9 +104,9 @@ void imgui_md::BLOCK_LI(const MD_BLOCK_LI_DETAIL*, bool e)
 			}
 		}
 
-		ImGui::Indent();
+    ImGui::Indent(m_indent_size);
 	} else {
-		ImGui::Unindent();
+		ImGui::Unindent(m_indent_size);
 	}
 }
 
@@ -278,6 +278,7 @@ void imgui_md::BLOCK_TD(const MD_BLOCK_TD_DETAIL*, bool e)
 		ImGui::SameLine();
 	}
 	
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
