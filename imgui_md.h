@@ -135,8 +135,8 @@ private:
 
 	void render_text(const char* str, const char* str_end);
 
-	void set_font(bool e);
-	void set_color(bool e);
+  virtual void set_font(bool e);
+  void set_color(bool e);
 	void set_href(bool e, const MD_ATTRIBUTE& src);
 
 	static void line(ImColor c, bool under);
