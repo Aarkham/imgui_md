@@ -117,7 +117,6 @@ void imgui_md::BLOCK_LI(const MD_BLOCK_LI_DETAIL* aDetailBlockLI, bool e)
         ImGui::SameLine(0.0f,m_indent_size*0.25f);
       }
 
-
   } else {
     ImGui::Unindent(m_indent_size);
   }
@@ -163,6 +162,29 @@ void imgui_md::BLOCK_QUOTE(bool)
 void imgui_md::BLOCK_CODE(const MD_BLOCK_CODE_DETAIL*, bool e)
 {
   m_is_code = e;
+  if(m_is_code)
+    {
+      ImGui::Indent();
+      ImGui::BeginGroup();
+      ImGui::Indent();
+      ImGui::NewLine();
+    }
+  else
+    {
+      ImGui::NewLine();
+      ImGui::Unindent();
+      ImGui::EndGroup();
+      ImGui::Unindent();
+
+      ImGuiContext& g = *GImGui;
+      ImDrawList* bg_draw_list=ImGui::GetWindowDrawList();
+      const ImColor c = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
+      ImVec2 rect_min=g.LastItemData.Rect.Min;
+      ImVec2 rect_max=g.LastItemData.Rect.Max;
+      float sep=rect_min.x-g.CurrentWindow->Rect().Min.x;
+
+      bg_draw_list->AddRect(rect_min,ImVec2(g.CurrentWindow->Rect().Max.x-sep,rect_max.y),c,15.0f);
+    }
 }
 
 void imgui_md::BLOCK_HTML(bool)
@@ -434,60 +456,74 @@ void imgui_md::render_text(const char* str, const char* str_end)
   const ImGuiStyle& s = ImGui::GetStyle();
   bool is_lf = false;
 
-  while (!m_is_image && str < str_end) {
+  while (!m_is_image && str < str_end)
+    {
+      const char* te = str_end;
 
-    const char* te = str_end;
+      if (!m_is_table_header)
+        {
 
-    if (!m_is_table_header) {
+          float wl = ImGui::GetContentRegionAvail().x;
 
-      float wl = ImGui::GetContentRegionAvail().x;
+          if (m_is_table_body)
+            {
+              wl = (m_table_next_column < m_table_col_pos.size() ?
+                m_table_col_pos[m_table_next_column] : m_table_last_pos.x);
+              wl -= ImGui::GetCursorPosX();
+            }
 
-      if (m_is_table_body) {
-        wl = (m_table_next_column < m_table_col_pos.size() ?
-          m_table_col_pos[m_table_next_column] : m_table_last_pos.x);
-        wl -= ImGui::GetCursorPosX();
-      }
+            te = ImGui::GetFont()->CalcWordWrapPositionA(scale, str, str_end, wl);
 
-      te = ImGui::GetFont()->CalcWordWrapPositionA(
-        scale, str, str_end, wl);
-
-      if (te == str)++te;
-    }
-
-    ImGui::TextUnformatted(str, te);
-
-    if (te > str && *(te - 1) == '\n') {
-      is_lf = true;
-    }
-    if (!m_href.empty()) {
-
-      ImVec4 c;
-      if (ImGui::IsItemHovered()) {
-
-        ImGui::SetTooltip("%s", m_href.c_str());
-
-        c = s.Colors[ImGuiCol_ButtonHovered];
-        if (ImGui::IsMouseReleased(0)) {
-          open_url();
+            if (te == str)
+              ++te;
         }
-      } else {
-        c = s.Colors[ImGuiCol_Button];
-      }
-      line(c, true);
-    }
-    if (m_is_underline) {
-      line(s.Colors[ImGuiCol_Text], true);
-    }
-    if (m_is_strikethrough) {
-      line(s.Colors[ImGuiCol_Text], false);
+
+      ImGui::TextUnformatted(str, te);
+
+      if (te > str && *(te - 1) == '\n')
+        {
+          is_lf = true;
+        }
+      if (!m_href.empty())
+        {
+          ImVec4 c;
+          if (ImGui::IsItemHovered())
+            {
+              ImGui::SetTooltip("%s", m_href.c_str());
+
+              c = s.Colors[ImGuiCol_ButtonHovered];
+              if (ImGui::IsMouseReleased(0))
+                {
+                  open_url();
+                }
+            }
+          else
+            {
+              c = s.Colors[ImGuiCol_Button];
+            }
+          line(c, true);
+        }
+
+      if (m_is_underline)
+        {
+          line(s.Colors[ImGuiCol_Text], true);
+        }
+
+      if (m_is_strikethrough)
+        {
+          line(s.Colors[ImGuiCol_Text], false);
+        }
+
+      str = te;
+
+      while (str < str_end && *str == ' ')
+        ++str;
     }
 
-    str = te;
-
-    while (str < str_end && *str == ' ')++str;
-  }
-
-  if (!is_lf)ImGui::SameLine(0.0f, 0.0f);
+  if (!is_lf)
+    {
+      ImGui::SameLine(0.0f, 0.0f);
+    }
 }
 
 
