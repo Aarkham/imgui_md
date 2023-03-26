@@ -125,6 +125,7 @@ protected:
 	bool m_is_table_body = false;
 	bool m_is_image = false;
 	bool m_is_code = false;
+	bool m_quote_level = 0;
 	unsigned m_hlevel=0;//0 - no heading
 
 private:

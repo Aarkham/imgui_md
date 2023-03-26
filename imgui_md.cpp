@@ -155,10 +155,36 @@ void imgui_md::BLOCK_DOC(bool)
 
 }
 
-void imgui_md::BLOCK_QUOTE(bool)
+void imgui_md::BLOCK_QUOTE(bool e)
 {
+  m_quote_level += ((e==true)?1:-1);
 
+  if(e)
+    {
+      ImGui::Indent();
+      ImGui::BeginGroup();
+      ImGui::Indent();
+    }
+  else
+    {
+      ImGui::Unindent();
+      ImGui::EndGroup();
+      ImGui::Unindent();
+
+      ImGuiContext& g = *GImGui;
+
+      const ImColor c = ImGui::GetStyle().Colors[ImGuiCol_TextDisabled];
+      float indent=g.Style.IndentSpacing*0.75f;
+
+      ImVec2 rect_min=g.LastItemData.Rect.Min;
+      rect_min.y+=g.FontSize;
+      ImVec2 rect_max{g.LastItemData.Rect.Min.x+indent,g.LastItemData.Rect.Max.y};
+
+      ImDrawList* bg_draw_list=ImGui::GetWindowDrawList();
+      bg_draw_list->AddRectFilled(rect_min,rect_max,c);
+    }
 }
+
 void imgui_md::BLOCK_CODE(const MD_BLOCK_CODE_DETAIL*, bool e)
 {
   m_is_code = e;
