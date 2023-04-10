@@ -354,11 +354,9 @@ void imgui_md::set_href(bool e, const MD_ATTRIBUTE& src)
 void imgui_md::set_font(bool e)
 {
   if (e) {
-    //ImGui::PushFont(get_font());
-      get_font();
+    ImGui::PushFont(get_font());
   } else {
-    //ImGui::PopFont();
-      ImGui::SetWindowFontScale(1.0f);
+    ImGui::PopFont();
   }
 }
 
@@ -410,38 +408,7 @@ void imgui_md::SPAN_IMG(const MD_SPAN_IMG_DETAIL* d, bool e)
   m_is_image = e;
 
   set_href(e, d->src);
-
-  if (e) {
-
-    image_info nfo;
-    if (get_image(nfo)) {
-
-      const float scale = ImGui::GetIO().FontGlobalScale;
-      nfo.size.x *= scale;
-      nfo.size.y *= scale;
-
-
-      ImVec2 const csz = ImGui::GetContentRegionAvail();
-      if (nfo.size.x > csz.x) {
-        const float r = nfo.size.y / nfo.size.x;
-        nfo.size.x = csz.x;
-        nfo.size.y = csz.x * r;
-      }
-
-      ImGui::Image(nfo.texture_id, nfo.size, nfo.uv0, nfo.uv1, nfo.col_tint, nfo.col_border);
-
-      if (ImGui::IsItemHovered()) {
-
-        //if (d->title.size) {
-        //	ImGui::SetTooltip("%.*s", (int)d->title.size, d->title.text);
-        //}
-
-        if (ImGui::IsMouseReleased(0)) {
-          open_url();
-        }
-      }
-    }
-  }
+  set_image(e,d->title);
 }
 
 void imgui_md::SPAN_CODE(bool)
@@ -592,10 +559,11 @@ static std::string UTF8Encoder(unsigned int aCodePoint)
 bool imgui_md::render_entity(const char* str, const char* str_end)
 {
   const size_t sz = str_end - str;
-  if (strncmp(str, "&nbsp;", sz) == 0) {
-    ImGui::TextUnformatted(""); ImGui::SameLine();
-    return true;
-  }
+  if (strncmp(str, "&nbsp;", sz) == 0)
+    {
+      ImGui::TextUnformatted(""); ImGui::SameLine();
+      return true;
+    }
 
   if(sz<4)
     {
@@ -929,6 +897,45 @@ ImVec4 imgui_md::get_color() const
   }
   return  ImGui::GetStyle().Colors[ImGuiCol_Text];
 }
+
+
+
+void imgui_md::set_image(bool e,const MD_ATTRIBUTE& aTitle)
+{
+  if (e) {
+
+    image_info nfo;
+    if (get_image(nfo)) {
+
+      const float scale = ImGui::GetIO().FontGlobalScale;
+      nfo.size.x *= scale;
+      nfo.size.y *= scale;
+
+
+      ImVec2 const csz = ImGui::GetContentRegionAvail();
+      if (nfo.size.x > csz.x) {
+        const float r = nfo.size.y / nfo.size.x;
+        nfo.size.x = csz.x;
+        nfo.size.y = csz.x * r;
+      }
+
+      ImGui::Image(nfo.texture_id, nfo.size, nfo.uv0, nfo.uv1, nfo.col_tint, nfo.col_border);
+
+      if (ImGui::IsItemHovered()) {
+
+        //if (d->title.size) {
+        //	ImGui::SetTooltip("%.*s", (int)d->title.size, d->title.text);
+        //}
+
+        if (ImGui::IsMouseReleased(0)) {
+          open_url();
+        }
+      }
+    }
+  }
+}
+
+
 
 
 bool imgui_md::get_image(image_info& nfo) const
