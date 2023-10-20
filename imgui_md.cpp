@@ -861,8 +861,19 @@ int imgui_md::span(MD_SPANTYPE type, void* d, bool e)
 
 int imgui_md::print(const char* str, const char* str_end)
 {
-  if (str >= str_end)return 0;
+  if (str >= str_end)
+    return 0;
+
   return md_parse(str, (MD_SIZE)(str_end - str), &m_md, this);
+}
+
+
+int imgui_md::print(const std::string& aString)
+{
+  if(aString.empty())
+    return 0;
+
+  return md_parse(aString.c_str(), (MD_SIZE)(aString.size()), &m_md, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

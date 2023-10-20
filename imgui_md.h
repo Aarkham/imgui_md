@@ -34,10 +34,11 @@
 struct imgui_md
 {
 	imgui_md();
-	virtual ~imgui_md() {};
+  virtual ~imgui_md() {}
 
 	//returns 0 on success
 	int print(const char* str, const char* str_end);
+  int print(const std::string& aString);
 
 	//for example, these flags can be changed in div callback
 
